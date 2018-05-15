@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "76783213266",
+    "firebase_url": "https://holla-18c8a.firebaseio.com",
+    "project_id": "holla-18c8a",
+    "storage_bucket": "holla-18c8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76783213266:android:2f4046f54549d81b",
+        "android_client_info": {
+          "package_name": "hu.ait.android.holla"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "76783213266-ss31h4f5llopigl79501ljk6cokchgre.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hu.ait.android.holla",
+            "certificate_hash": "7464a8dd0985e5ba17da7fdad1d64b77c7ddbf38"
+          }
+        },
+        {
+          "client_id": "76783213266-me8sgu3tgn7jun04tscna1guvqt2g4je.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxLQG3wvh5sWYApccj7IS2FIEmtSZOjOI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "76783213266-me8sgu3tgn7jun04tscna1guvqt2g4je.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

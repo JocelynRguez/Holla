@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <ImageView
+            android:id="@+id/ivPlace"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="3dp"
+            android:src="@drawable/coffee_icon" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_marginLeft="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/ivPlace"
+            android:textSize="18dp"
+            android:text="SHOP NAME"/>
+
+        <TextView
+            android:id="@+id/tvRating"
+            android:layout_marginLeft="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvName"
+            android:layout_toRightOf="@+id/ivPlace"
+            android:text="X Stars" />
+
+        <TextView
+            android:id="@+id/tvDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/tvRating"
+            android:layout_toRightOf="@+id/ivPlace"
+            android:text="Description"/>
+
+        <TextView
+            android:id="@+id/tvAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/tvDetails"
+            android:layout_toRightOf="@+id/ivPlace"
+            android:text="Address"/>
+
+
+        <ToggleButton
+            android:id="@+id/btnFav"
+            android:layout_alignParentRight="true"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/button_favorite"
+            android:checked="false"
+            android:text=""
+            android:textOff=""
+            android:textOn=""/>
+
+
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
