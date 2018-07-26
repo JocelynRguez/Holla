@@ -22,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +37,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 
 import hu.ait.android.holla.adapter.PlacesAdapter;
+import hu.ait.android.holla.adapter.TeaAdapter;
 import hu.ait.android.holla.data.Place;
 import hu.ait.android.holla.data.PlaceResult;
 import hu.ait.android.holla.data.Result;
@@ -49,7 +51,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TeaActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener{
 
     private ProgressDialog progressDialog;
-    private final String URL_BASE = "https://maps.googleapis.com/maps/api/place/nearbysearch/";
+    private final String URL_BASE = "https://maps.googleapis.com/maps/api/place/";
     private final String API_KEY = "AIzaSyAB1X1dK-fLyGAAuiKD9127SjgVh2K5XrI";
 
     private GoogleMap mMap;
@@ -59,7 +61,8 @@ public class TeaActivity extends AppCompatActivity implements NavigationView.OnN
     TextView tvLocation;
     private String currentLocation;
 
-    private PlacesAdapter placesAdapter;
+    private TeaAdapter teaAdapter;
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,36 +85,55 @@ public class TeaActivity extends AppCompatActivity implements NavigationView.OnN
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        placesAdapter = new PlacesAdapter(getApplicationContext(), FirebaseAuth.getInstance().getUid());
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        setupAdapter();
+
+
+        dialog = new ProgressDialog(this);
+        dialog.setMessage(getResources().getString(R.string.getLocation));
+        dialog.show();
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        setUpToolBar(drawer);
+    }
+
+    private void setupAdapter() {
+        teaAdapter = new TeaAdapter(getApplicationContext(), FirebaseAuth.getInstance().getUid());
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.TeaRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        recyclerView.setAdapter(placesAdapter);
+        recyclerView.setAdapter(teaAdapter);
+    }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    private void setUpToolBar(final DrawerLayout drawerLayout) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Tea");
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        toolbar.setNavigationIcon(R.mipmap.app_icon);
+        toolbar.setBackgroundColor(getResources().getColor(R.color.registerbackground));
     }
 
     private void requestNeededPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Toast...
             }
-
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     101);
         } else {
-            Toast.makeText(this, "Permission Granted!", Toast.LENGTH_SHORT).show();
             startLocationMonitoring();
         }
     }
@@ -119,7 +141,6 @@ public class TeaActivity extends AppCompatActivity implements NavigationView.OnN
     private void startLocationMonitoring() {
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50000, 10, this);
-            //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -138,12 +159,9 @@ public class TeaActivity extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(this,
-                "Location: " + location.getLatitude() + ", " + location.getLongitude(),
-                Toast.LENGTH_SHORT).show();
-
+        dialog.dismiss();
         LatLng currLoc = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(currLoc));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 12));
         currentLocation = location.getLatitude() + "," + location.getLongitude();
         getPlaces();
 
@@ -155,11 +173,9 @@ public class TeaActivity extends AppCompatActivity implements NavigationView.OnN
         callPlace.enqueue(new Callback<PlaceResult>() {
             @Override
             public void onResponse(Call<PlaceResult> call, Response<PlaceResult> response) {
-                Log.d("SUCCESS", "Connected!" + response.body());
                 List<Result> results = response.body().getResults();
                 if(response.isSuccessful()){
                     for (int i = 0; i < results.size(); i++) {
-                        Log.d("RESULT", "result " + i + " is:" + response.body());
                         Result curr = results.get(i);
                         LatLng newPlace = new LatLng(curr.getGeometry().getLocation().getLat(),
                                 curr.getGeometry().getLocation().getLng());
@@ -173,7 +189,7 @@ public class TeaActivity extends AppCompatActivity implements NavigationView.OnN
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        placesAdapter.addPlace(place);
+                                        teaAdapter.addPlace(place);
                                     }
                                 });
                             }
@@ -185,8 +201,7 @@ public class TeaActivity extends AppCompatActivity implements NavigationView.OnN
 
             @Override
             public void onFailure(Call<PlaceResult> call, Throwable t) {
-                //Toast.makeText(this, "Failure to get API" , Toast.LENGTH_SHORT).show();
-                Log.d("FAIL TO CONNECT", "onFailure: ");
+
             }
         });
     }

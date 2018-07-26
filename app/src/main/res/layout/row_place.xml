@@ -19,45 +19,47 @@
             android:layout_margin="3dp"
             android:src="@drawable/coffee_icon" />
 
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_marginLeft="10dp"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/info"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/ivPlace"
-            android:textSize="18dp"
-            android:text="SHOP NAME"/>
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvRating"
-            android:layout_marginLeft="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvName"
-            android:layout_toRightOf="@+id/ivPlace"
-            android:text="X Stars" />
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18dp"
+                android:text="@string/shop_name"/>
 
-        <TextView
-            android:id="@+id/tvDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_below="@+id/tvRating"
-            android:layout_toRightOf="@+id/ivPlace"
-            android:text="Description"/>
+            <TextView
+                android:id="@+id/tvRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rating" />
 
-        <TextView
-            android:id="@+id/tvAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_below="@+id/tvDetails"
-            android:layout_toRightOf="@+id/ivPlace"
-            android:text="Address"/>
+            <TextView
+                android:id="@+id/tvDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/description"/>
+
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/address"/>
+
+
+        </LinearLayout>
+
 
 
         <ToggleButton
             android:id="@+id/btnFav"
+            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_width="50dp"
             android:layout_height="50dp"

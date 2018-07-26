@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.ScaleAnimation;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,8 +23,7 @@ import java.util.List;
 import hu.ait.android.holla.R;
 import hu.ait.android.holla.data.Place;
 
-public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder> {
-
+public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavViewHolder> {
     private Context context;
     private List<Place> placeList;
     private List<String> placeKeys;
@@ -34,7 +32,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     private ScaleAnimation scaleAnimation;
     private BounceInterpolator bounceInterpolator;
 
-    public PlacesAdapter(Context context, String uID) {
+    public FavoritesAdapter(Context context, String uID) {
         this.context = context;
         this.uID = uID;
         placeKeys = new ArrayList<String>();
@@ -43,15 +41,15 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_place, parent, false);
-        ViewHolder vh = new ViewHolder(v);
+        FavoritesAdapter.FavViewHolder vh = new FavoritesAdapter.FavViewHolder(v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final FavViewHolder holder, int position) {
         holder.tvName.setText(placeList.get(holder.getAdapterPosition()).getName());
         holder.tvRating.setText(placeList.get(holder.getAdapterPosition()).getRating());
         holder.tvAddress.setText(placeList.get(holder.getAdapterPosition()).getAddress());
@@ -83,10 +81,11 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
                             placeList.get(holder.getAdapterPosition()).getAddress(), placeList.get(holder.getAdapterPosition()).getImg(),
                             placeList.get(holder.getAdapterPosition()).isFav());
                     FirebaseDatabase.getInstance().getReference().child("favs").child(key).setValue(newPlace);
+                } else {
+                    removeFav(holder.getAdapterPosition());
                 }
             }
         });
-
     }
 
     private void setUpAnimation() {
@@ -107,13 +106,38 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
+    public void addFav(Place place, String key) {
+        placeList.add(place);
+        placeKeys.add(key);
+        notifyDataSetChanged();
+    }
+
+    public void removeFav(int index) {
+        FirebaseDatabase.getInstance().getReference("favs").child(
+                placeKeys.get(index)).removeValue();
+        placeList.remove(index);
+        placeKeys.remove(index);
+        notifyItemRemoved(index);
+    }
+
+    public void removeFavByKey(String key) {
+        int index = placeKeys.indexOf(key);
+        if (index != -1) {
+            placeList.remove(index);
+            placeKeys.remove(index);
+            notifyItemRemoved(index);
+        }
+    }
+
+
     public void deleteAll() {
         placeList.clear();
         placeKeys.clear();
         notifyDataSetChanged();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+    public static class FavViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView ivPlace;
         public TextView tvName;
@@ -122,7 +146,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         public TextView tvAddress;
         public ToggleButton btnFav;
 
-        public ViewHolder(View itemView) {
+        public FavViewHolder(View itemView) {
             super(itemView);
 
             ivPlace = itemView.findViewById(R.id.ivPlace);

@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -20,12 +21,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import hu.ait.android.holla.adapter.FavoritesAdapter;
 import hu.ait.android.holla.adapter.PlacesAdapter;
 import hu.ait.android.holla.data.Place;
 
 public class FavoritesActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
-    private PlacesAdapter placesAdapter;
+    private FavoritesAdapter favoritesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,32 +38,45 @@ public class FavoritesActivity extends AppCompatActivity implements NavigationVi
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        setUpToolBar(drawer);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        placesAdapter = new PlacesAdapter(getApplicationContext(), FirebaseAuth.getInstance().getUid());
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        favoritesAdapter = new FavoritesAdapter(getApplicationContext(), FirebaseAuth.getInstance().getUid());
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.favRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        recyclerView.setAdapter(placesAdapter);
+        recyclerView.setAdapter(favoritesAdapter);
         initItems();
     }
 
+    private void setUpToolBar(final DrawerLayout drawerLayout) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Favorites");
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        toolbar.setNavigationIcon(R.mipmap.app_icon);
+        toolbar.setBackgroundColor(getResources().getColor(R.color.registerbackground));
+    }
+
     public void initItems() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("favs");
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference(getResources().getString(R.string.data_branch));
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Place newPlace = dataSnapshot.getValue(Place.class);
-                placesAdapter.addFav(newPlace, dataSnapshot.getKey());
+                favoritesAdapter.addFav(newPlace, dataSnapshot.getKey());
             }
 
             @Override
@@ -71,7 +86,7 @@ public class FavoritesActivity extends AppCompatActivity implements NavigationVi
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                placesAdapter.removeFavByKey(dataSnapshot.getKey());
+                favoritesAdapter.removeFavByKey(dataSnapshot.getKey());
             }
 
             @Override
